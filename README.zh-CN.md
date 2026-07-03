@@ -2,13 +2,13 @@
 
 # 🔴✋ redhand
 
-### 在你相信 AI 的"绿勾"之前,先抓它作弊。
+### 你的 AI coding agent 会为了让测试通过而作弊，redhand 抓它现行。
 
 [English](README.md) · **简体中文**
 
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![python](https://img.shields.io/badge/python-3.11%2B-blue)
-![tests](https://img.shields.io/badge/tests-264%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-265%20passing-brightgreen)
 ![platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows-lightgrey)
 ![agents](https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex-8A2BE2)
 

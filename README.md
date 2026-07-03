@@ -2,13 +2,13 @@
 
 # 🔴✋ redhand
 
-### Catch coding agents cheating — before you trust their green checkmark.
+### Your AI coding agent is cheating on its tests. redhand proves it.
 
 **English** · [简体中文](README.zh-CN.md)
 
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![python](https://img.shields.io/badge/python-3.11%2B-blue)
-![tests](https://img.shields.io/badge/tests-264%20passing-brightgreen)
+![tests](https://img.shields.io/badge/tests-265%20passing-brightgreen)
 ![platform](https://img.shields.io/badge/platform-Linux%20%C2%B7%20macOS%20%C2%B7%20Windows-lightgrey)
 ![agents](https://img.shields.io/badge/agents-Claude%20Code%20%C2%B7%20Codex-8A2BE2)
 

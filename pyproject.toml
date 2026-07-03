@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "redhand"
 version = "0.1.0"
-description = "A red-team gym that catches coding agents cheating when an honest solution is hard."
+description = "Your AI coding agent is cheating on its tests. redhand proves it."
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
