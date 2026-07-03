@@ -1,0 +1,24 @@
+# virtualenv / build
+.venv/
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# redhand runtime artifacts
+redhand-sandboxes/
+results/
+*.log
+
+# research-git internal store (not part of the public project)
+.rgit/
+
+# editor / OS
+.idea/
+.vscode/
+.DS_Store
+
+# docs/sample_dashboard.html is intentionally committed as a static showcase
+# (regenerate anytime with: redhand demo --out results)

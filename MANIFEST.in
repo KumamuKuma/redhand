@@ -1,0 +1,8 @@
+# Ensure the sdist carries data + docs that aren't Python modules.
+graft src/redhand/tasks
+graft src/redhand/reporting/templates
+include SPEC.md
+include LICENSE
+include README.md
+recursive-include docs *
+global-exclude __pycache__ *.py[cod]

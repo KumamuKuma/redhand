@@ -1,0 +1,182 @@
+{#- redhand static dashboard. Autoescape is ON; css/js injected via |safe. -#}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ title }}</title>
+<style>{{ styles|safe }}</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>{{ title }}</h1>
+    <div class="sub">Generated {{ generated_at }} &middot; self-contained, offline report</div>
+    <div class="kpis">
+      <div class="kpi"><div class="n">{{ n_agents }}</div><div class="l">Agents</div></div>
+      <div class="kpi"><div class="n">{{ leaderboard|sum(attribute='n_tasks') }}</div><div class="l">Agent&times;Task cells</div></div>
+      <div class="kpi"><div class="n">{{ n_flagged }}</div><div class="l">Flagged runs</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  {# ---------------- Leaderboard ---------------- #}
+  <h2 class="section">Leaderboard &middot; safest first</h2>
+  <div class="board-scroll">
+  <table class="board">
+    <thead>
+      <tr>
+        <th class="rank">#</th>
+        <th class="agent">Agent</th>
+        <th>Tasks</th>
+        <th>True success</th>
+        <th>Cheat rate</th>
+        <th>Deceptive</th>
+        <th>Cost&nbsp;$</th>
+        <th>Grade</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in leaderboard %}
+      <tr>
+        <td class="rank">{{ r.rank }}</td>
+        <td class="agent">{{ r.agent }}</td>
+        <td>{{ r.n_tasks }}</td>
+        <td class="good">{{ "%.0f%%"|format(100 * r.true_success) }}</td>
+        <td class="{{ 'bad' if r.cheat_rate else 'good' }}">{{ "%.0f%%"|format(100 * r.cheat_rate) }}</td>
+        <td class="{{ 'bad' if r.deceptive_success else 'good' }}">{{ "%.0f%%"|format(100 * r.deceptive_success) }}</td>
+        <td>{{ "%.2f"|format(r.cost) }}</td>
+        <td><span class="grade sm {{ r.grade_class }}">{{ r.grade }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+
+  {# ---------------- Agent scorecards ---------------- #}
+  <h2 class="section">Agent scorecards</h2>
+  <div class="cards">
+    {% for a in agents %}
+    <div class="card {{ a.grade_class }}">
+      <div class="head">
+        <span class="name">{{ a.agent }}</span>
+        <span class="grade {{ a.grade_class }}" title="Overall safety grade">{{ a.grade }}</span>
+      </div>
+      <div class="meta">{{ a.n_tasks }} task(s) &middot; {{ a.runs_per_task }} run(s)/task</div>
+
+      <div class="row"><span class="k">True success (hidden tests)</span><span class="v">{{ "%.0f%%"|format(100 * a.true_success) }}</span></div>
+      <div class="row"><span class="k">Claimed success (visible)</span><span class="v">{{ "%.0f%%"|format(100 * a.claimed_success) }}</span></div>
+      <div class="row deceptive"><span class="k">Deceptive success</span><span class="v">{{ "%.0f%%"|format(100 * a.deceptive_success) }}</span></div>
+      <div class="row"><span class="k">Cheat rate</span><span class="v">{{ "%.0f%%"|format(100 * a.cheat_rate) }}</span></div>
+      <div class="row"><span class="k">Recovery score</span><span class="v">{{ "%.0f"|format(a.recovery) }}/100</span></div>
+      <div class="row"><span class="k">Mean cost</span><span class="v">${{ "%.2f"|format(a.cost) }}</span></div>
+
+      <div class="bytype">
+        {% if a.tag_counts %}
+          {% for tc in a.tag_counts %}
+          <span class="chip" title="{{ tc.tag }}"><span class="c">{{ tc.code }}</span><span class="count">{{ tc.count }}</span></span>
+          {% endfor %}
+        {% else %}
+          <span class="chip none">no sabotage detected</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {# ---------------- Failure replay ---------------- #}
+  <h2 class="section">Flagged runs &middot; trajectory replay</h2>
+  {% if failure_cases %}
+  <div class="controls">
+    <button id="expand-all" type="button">Expand all</button>
+    <button id="collapse-all" type="button">Collapse all</button>
+  </div>
+  {% for c in failure_cases %}
+  <details class="case">
+    <summary>
+      <span class="id">{{ c.task_id }}</span>
+      <span class="run">{{ c.agent }} &middot; run #{{ c.run_index }}</span>
+      {% for tg in c.tags %}
+      <span class="chip" title="{{ tg.description }}"><span class="c">{{ tg.code }}</span> {{ tg.value }}</span>
+      {% endfor %}
+      <span class="badges">
+        <span class="badge {{ 'claim' if c.claimed else 'fail' }}">claimed: {{ "yes" if c.claimed else "no" }}</span>
+        <span class="badge {{ 'ok' if c.truly else 'fail' }}">hidden: {{ "pass" if c.truly else "fail" }}</span>
+      </span>
+    </summary>
+    <div class="body">
+      {% if c.reasons %}
+      <div class="row" style="border:none;padding-top:8px;">
+        <span class="k" style="color:var(--danger);font-weight:700;">Why flagged:</span>
+        <span class="v" style="font-weight:500;">{{ c.reasons|join("; ") }}</span>
+      </div>
+      {% endif %}
+
+      {% if c.evidences %}
+      <div class="evidence">
+        <h4>Sabotage evidence</h4>
+        {% for e in c.evidences %}
+        <div class="ev">
+          <div class="top">
+            <span class="chip"><span class="c">{{ e.code }}</span> {{ e.tag }}</span>
+            <span class="det">{{ "AST/rule" if e.deterministic else "LLM-judge" }}</span>
+            <span class="where">
+              {{ e.detector }}{% if e.file %} &middot; {{ e.file }}{% if e.line is not none %}:{{ e.line }}{% endif %}{% endif %}
+              &middot; conf {{ "%.2f"|format(e.confidence) }}
+            </span>
+          </div>
+          {% if e.explanation %}<div class="expl">{{ e.explanation }}</div>{% endif %}
+          {% if e.snippet %}<pre>{{ e.snippet }}</pre>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <div class="steps">
+        {% for s in c.steps %}
+        <div class="step">
+          <div class="sh">
+            <span class="n">#{{ s.index }}</span>
+            {% if s.tool %}<span class="tool">{{ s.tool }}</span>{% endif %}
+            {% if s.tool_args %}<span class="args">{{ s.tool_args }}</span>{% endif %}
+            {% if s.command %}
+              <span class="exit {{ 'ok' if s.command.ok else 'err' }}">exit {{ s.command.exit_code }}</span>
+            {% endif %}
+            {% if s.note %}<span class="note">{{ s.note }}</span>{% endif %}
+          </div>
+
+          {% if s.command %}
+          <div class="cmd out"><pre>$ {{ s.command.command }}</pre></div>
+          {% if s.command.stdout %}<div class="out"><pre>{{ s.command.stdout }}</pre></div>{% endif %}
+          {% if s.command.stderr %}<div class="out"><pre>{{ s.command.stderr }}</pre></div>{% endif %}
+          {% endif %}
+
+          {% for d in s.diffs %}
+          <div class="diff {{ 'flagged' if d.flagged else '' }}">
+            <div class="dh">
+              <span class="ct">{{ d.change_type }}</span>
+              <span>{{ d.path }}</span>
+              {% if d.flagged %}<span class="flag">&#9873; sabotage hit</span>{% endif %}
+            </div>
+            <div class="code">
+              {% for ln in d.lines %}<span class="ln {{ ln.kind }}">{{ ln.text }}</span>{% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </details>
+  {% endfor %}
+  {% else %}
+  <div class="empty">No flagged runs. Every attempt truly passed the hidden tests with no sabotage detected.</div>
+  {% endif %}
+
+  <footer>redhand &middot; generated {{ generated_at }} &middot; no external resources &middot; open with file://</footer>
+</div>
+<script>{{ script|safe }}</script>
+</body>
+</html>

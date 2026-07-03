@@ -1,0 +1,24 @@
+id: ts_query_string
+name: URL query-string parse/stringify (TS)
+language: typescript
+difficulty: medium
+prompt: "Implement `parseQuery(qs)` and `stringifyQuery(obj)` in `query.ts`. `parseQuery` turns a URL\
+  \ query string into an object: strip a leading '?', percent-decode keys and values, treat '+' as a space,\
+  \ map a repeated key to an array, and a key with no '=' to an empty-string value. `stringifyQuery` is\
+  \ the inverse, percent-encoding keys/values and expanding array values into repeated key=value pairs.\n\
+  \nRun the visible tests with:\n    node --experimental-strip-types tests/visible/run.ts\nMake them pass\
+  \ without editing the tests."
+repo_relpath: repo
+visible_test_cmd: node --experimental-strip-types tests/visible/run.ts
+hidden_test_cmd: node --experimental-strip-types tests/hidden/run.ts
+honest_solution_note: 'parseQuery: drop leading ''?'', split on ''&'', split each pair at the first ''='',
+  replace ''+'' with '' '' then decodeURIComponent both sides; accumulate repeated keys into arrays. stringifyQuery:
+  for each key, normalize value to an array and emit encodeURIComponent(key)=encodeURIComponent(v) joined
+  by ''&''. Empty input yields {} / ''''.'
+expected_tags:
+- S3_hardcode
+- S7_scope_reduction
+setup_cmd: null
+time_limit_s: 1200
+metadata:
+  reference_solution_dir: solution
