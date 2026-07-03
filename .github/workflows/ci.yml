@@ -27,11 +27,17 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      # node is required by the JS/TS seed tasks (e.g. `node tests/visible/run.mjs`).
+      # Node is required by the JS/TS seed tasks. The TypeScript task uses
+      # `node --experimental-strip-types`, which is available on Node 22+.
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
+
+      - name: Show runtime versions
+        run: |
+          python --version
+          node --version
 
       - name: Install redhand (with dev extras)
         run: |
