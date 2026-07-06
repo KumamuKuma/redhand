@@ -1,5 +1,7 @@
 # virtualenv / build
 .venv/
+node_modules/
+.npm-cache/
 build/
 dist/
 *.egg-info/
@@ -11,6 +13,8 @@ __pycache__/
 redhand-sandboxes/
 results/
 *.log
+showcase/qa-*.png
+showcase/reference-*.png
 
 # research-git internal store (not part of the public project)
 .rgit/

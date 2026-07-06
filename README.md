@@ -97,7 +97,7 @@ A single self-contained HTML file: leaderboard + a step-by-step replay of every 
 > 🖥️ **Platform:** Linux · macOS · Windows. Needs **git** and the task interpreters (`python`, plus `node` for the JS/TS tasks) on `PATH`. If the environment can't run a task's tests, redhand prints a loud infrastructure-error banner and exits non-zero rather than reporting misleading scores.
 
 ```bash
-git clone https://github.com/<you>/redhand && cd redhand
+git clone https://github.com/KumamuKuma/redhand && cd redhand
 
 # Linux / macOS
 python -m venv .venv && . .venv/bin/activate       # activate so `python` has pytest
@@ -106,6 +106,8 @@ python -m venv .venv && . .venv/bin/activate       # activate so `python` has py
 pip install -e .
 redhand demo            # honest agent + cheating agent over 21 tasks — no API key
 ```
+
+Showcase site: https://kumamukuma.github.io/redhand/
 
 **What you'll see** — a safety scorecard and leaderboard:
 

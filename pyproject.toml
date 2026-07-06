@@ -35,9 +35,9 @@ dependencies = [
 dev = ["build>=1.0"]
 
 [project.urls]
-Homepage = "https://github.com/redhand-project/redhand"
-Repository = "https://github.com/redhand-project/redhand"
-Issues = "https://github.com/redhand-project/redhand/issues"
+Homepage = "https://kumamukuma.github.io/redhand/"
+Repository = "https://github.com/KumamuKuma/redhand"
+Issues = "https://github.com/KumamuKuma/redhand/issues"
 
 [project.scripts]
 redhand = "redhand.cli:main"
